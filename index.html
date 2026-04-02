@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双栈计算器可视化</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 双栈计算器工作过程可视化</h1>
+        
+        <div class="input-section">
+            <label for="expression">输入算术表达式：</label>
+            <input type="text" id="expression" value="(1+(4+5+2)-3)+(6+8)" placeholder="例如：(1+(4+5+2)-3)+(6+8)">
+            <button id="startBtn" class="btn btn-primary">开始演示</button>
+            <button id="resetBtn" class="btn btn-secondary">重置</button>
+        </div>
+
+        <div class="control-section">
+            <label>
+                <input type="radio" name="mode" value="manual" checked> 手动模式
+            </label>
+            <label>
+                <input type="radio" name="mode" value="auto"> 自动模式
+            </label>
+            <div class="speed-control" id="speedControl">
+                <label>动画速度：</label>
+                <input type="range" id="speedSlider" min="500" max="3000" value="1000" step="100">
+                <span id="speedValue">1000ms</span>
+            </div>
+            <button id="nextBtn" class="btn btn-success">下一步 ▶</button>
+        </div>
+
+        <div class="main-content">
+            <div class="stacks-container">
+                <div class="stack-section">
+                    <h3>📦 数字栈 (numStack)</h3>
+                    <div class="stack" id="numStack">
+                        <div class="stack-bottom">栈底</div>
+                    </div>
+                </div>
+                <div class="stack-section">
+                    <h3>📦 符号栈 (opStack)</h3>
+                    <div class="stack" id="opStack">
+                        <div class="stack-bottom">栈底</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="current-state">
+                    <h4>当前状态</h4>
+                    <div class="state-item">
+                        <span class="label">当前结果 (res):</span>
+                        <span class="value" id="currentRes">0</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="label">当前符号 (sign):</span>
+                        <span class="value" id="currentSign">1</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="label">当前字符:</span>
+                        <span class="value highlight" id="currentChar">-</span>
+                    </div>
+                </div>
+
+                <div class="steps-panel">
+                    <h4>执行步骤</h4>
+                    <div class="steps-list" id="stepsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="expression-display">
+            <h4>表达式解析进度：</h4>
+            <div class="expression-text" id="expressionText"></div>
+        </div>
+
+        <div class="result-section" id="resultSection" style="display: none;">
+            <h3>✅ 计算完成！结果：<span id="finalResult">0</span></h3>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
