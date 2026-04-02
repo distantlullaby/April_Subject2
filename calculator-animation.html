@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双栈计算器动画演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .example-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .example-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stacks-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .stack-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .stack-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stack-title::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .num-stack .stack-title::before {
+            background: #4CAF50;
+        }
+
+        .op-stack .stack-title::before {
+            background: #FF9800;
+        }
+
+        .stack-visual {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            min-height: 400px;
+            border: 3px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .stack-item {
+            width: 100%;
+            max-width: 150px;
+            padding: 15px;
+            margin: 5px 0;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 8px;
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stack-item.pushing {
+            animation: pushAnim 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stack-item.poping {
+            animation: popAnim 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stack-item.highlight {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .num-stack .stack-item {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .op-stack .stack-item {
+            background: linear-gradient(135deg, #FF9800, #f57c00);
+            color: white;
+        }
+
+        @keyframes pushAnim {
+            0% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popAnim {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        .state-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .state-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .state-values {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .state-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .state-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .state-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .expression-progress {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+        }
+
+        .char-normal {
+            color: #666;
+        }
+
+        .char-current {
+            color: #667eea;
+            font-weight: bold;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .char-processed {
+            color: #4CAF50;
+        }
+
+        .control-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #FF9800, #f57c00);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 152, 0, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(244, 67, 54, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+        }
+
+        .speed-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 150px;
+            cursor: pointer;
+        }
+
+        .step-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .final-result {
+            margin-top: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: resultPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes resultPop {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stacks-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .state-values {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .speed-control {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 双栈计算器算法动画演示</h1>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="expression" placeholder="输入表达式，例如: (1+(4+5+2)-3)+(6+8)" value="(1+(4+5+2)-3)+(6+8)">
+                <button class="btn btn-primary" onclick="startAnimation()">▶ 开始演示</button>
+                <button class="btn btn-danger" onclick="reset()">↺ 重置</button>
+            </div>
+            <div class="example-btns">
+                <span style="color: #666; margin-right: 10px;">示例:</span>
+                <button class="example-btn" onclick="setExpression('1 + 1')">1 + 1</button>
+                <button class="example-btn" onclick="setExpression(' 2-1 + 2 ')">2-1 + 2</button>
+                <button class="example-btn" onclick="setExpression('(1+(4+5+2)-3)+(6+8)')">(1+(4+5+2)-3)+(6+8)</button>
+            </div>
+        </div>
+
+        <div class="state-panel">
+            <div class="state-title">📊 当前状态</div>
+            <div class="state-values">
+                <div class="state-item">
+                    <div class="state-label">当前结果 (res)</div>
+                    <div class="state-value" id="res">0</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-label">当前符号 (sign)</div>
+                    <div class="state-value" id="sign">1</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-label">当前索引 (i)</div>
+                    <div class="state-value" id="index">0</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-label">当前数字 (num)</div>
+                    <div class="state-value" id="num">0</div>
+                </div>
+            </div>
+            <div class="expression-progress" id="expression-progress"></div>
+        </div>
+
+        <div class="stacks-container">
+            <div class="stack-panel num-stack">
+                <div class="stack-title">数字栈 (numStack)</div>
+                <div class="stack-visual" id="num-stack"></div>
+            </div>
+            <div class="stack-panel op-stack">
+                <div class="stack-title">符号栈 (opStack)</div>
+                <div class="stack-visual" id="op-stack"></div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-buttons">
+                <button class="btn btn-success" id="prev-btn" onclick="prevStep()" disabled>◀ 上一步</button>
+                <button class="btn btn-success" id="next-btn" onclick="nextStep()">▶ 下一步</button>
+                <button class="btn btn-warning" id="auto-btn" onclick="toggleAuto()">▶▶ 自动播放</button>
+                <div class="speed-control">
+                    <span class="speed-label">速度:</span>
+                    <input type="range" id="speed" min="200" max="2000" value="800">
+                    <span id="speed-value">800ms</span>
+                </div>
+            </div>
+            <div class="step-info">
+                <div class="step-number" id="step-number">步骤 0 / 0</div>
+                <div class="step-description" id="step-description">点击"开始演示"开始算法动画</div>
+            </div>
+            <div id="final-result-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let steps = [];
+        let currentStep = -1;
+        let isAutoPlaying = false;
+        let autoInterval = null;
+
+        function setExpression(expr) {
+            document.getElementById('expression').value = expr;
+            reset();
+        }
+
+        function reset() {
+            stopAuto();
+            steps = [];
+            currentStep = -1;
+            document.getElementById('num-stack').innerHTML = '';
+            document.getElementById('op-stack').innerHTML = '';
+            document.getElementById('res').textContent = '0';
+            document.getElementById('sign').textContent = '+';
+            document.getElementById('index').textContent = '0';
+            document.getElementById('num').textContent = '0';
+            document.getElementById('step-number').textContent = '步骤 0 / 0';
+            document.getElementById('step-description').textContent = '点击"开始演示"开始算法动画';
+            document.getElementById('expression-progress').innerHTML = '';
+            document.getElementById('final-result-container').innerHTML = '';
+            document.getElementById('prev-btn').disabled = true;
+            document.getElementById('next-btn').disabled = true;
+        }
+
+        function generateSteps(s) {
+            steps = [];
+            s = s;
+            let numStack = [];
+            let opStack = [];
+            let res = 0;
+            let sign = 1;
+            let n = s.length;
+            let num = 0;
+
+            steps.push({
+                numStack: [...numStack],
+                opStack: [...opStack],
+                res: res,
+                sign: sign,
+                index: 0,
+                num: num,
+                description: '初始化: res = 0, sign = \'+\', 两个空栈',
+                action: 'init'
+            });
+
+            for (let i = 0; i < n; i++) {
+                let c = s.charAt(i);
+
+                if (/\d/.test(c)) {
+                    num = 0;
+                    let startI = i;
+                    let digits = [];
+                    
+                    while (i < n && /\d/.test(s.charAt(i))) {
+                        digits.push(s.charAt(i));
+                        num = num * 10 + (s.charAt(i) - '0');
+                        i++;
+                        
+                        steps.push({
+                            numStack: [...numStack],
+                            opStack: [...opStack],
+                            res: res,
+                            sign: sign,
+                            index: i,
+                            num: num,
+                            description: `读取数字 '${s.charAt(i-1)}', 累计 num = ${num}`,
+                            action: 'digit',
+                            charIndex: i - 1
+                        });
+                    }
+                    i--;
+                    res += sign * num;
+                    
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `数字读取完成: ${num}, 执行 res += '${sign === 1 ? '+' : '-'}' * ${num} → res = ${res}`,
+                        action: 'number_complete',
+                        charIndex: i
+                    });
+                    num = 0;
+                }
+                else if (c === '+') {
+                    sign = 1;
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `遇到 '+', 设置 sign = '+'`,
+                        action: 'plus',
+                        charIndex: i
+                    });
+                }
+                else if (c === '-') {
+                    sign = -1;
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `遇到 '-', 设置 sign = '-'`,
+                        action: 'minus',
+                        charIndex: i
+                    });
+                }
+                else if (c === '(') {
+                    numStack.push(res);
+                    opStack.push(sign === 1 ? '+' : '-');
+                    
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `遇到 '(', 压栈保存: numStack.push(${res}), opStack.push('${sign === 1 ? '+' : '-'}')`,
+                        action: 'push',
+                        charIndex: i
+                    });
+                    
+                    res = 0;
+                    sign = 1;
+                    
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `重置现场: res = 0, sign = '+', 开始计算括号内表达式`,
+                        action: 'reset_scope',
+                        charIndex: i
+                    });
+                }
+                else if (c === ')') {
+                    let poppedNum = numStack.pop();
+                    let poppedOp = opStack.pop();
+                    let poppedOpValue = poppedOp === '+' ? 1 : -1;
+                    
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `遇到 ')', 出栈: numStack.pop() = ${poppedNum}, opStack.pop() = '${poppedOp}'`,
+                        action: 'pop',
+                        charIndex: i
+                    });
+                    
+                    res = poppedNum + poppedOpValue * res;
+                    
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `合并结果: res = ${poppedNum} + '${poppedOp}' * 括号内结果 → res = ${res}`,
+                        action: 'merge',
+                        charIndex: i
+                    });
+                }
+                else if (c === ' ') {
+                    steps.push({
+                        numStack: [...numStack],
+                        opStack: [...opStack],
+                        res: res,
+                        sign: sign,
+                        index: i,
+                        num: num,
+                        description: `遇到空格，跳过`,
+                        action: 'space',
+                        charIndex: i
+                    });
+                }
+            }
+
+            steps.push({
+                numStack: [...numStack],
+                opStack: [...opStack],
+                res: res,
+                sign: sign,
+                index: n,
+                num: num,
+                description: `计算完成！最终结果 = ${res}`,
+                action: 'complete',
+                finalResult: res
+            });
+        }
+
+        function startAnimation() {
+            reset();
+            const expr = document.getElementById('expression').value;
+            generateSteps(expr);
+            currentStep = 0;
+            renderStep();
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function renderStep() {
+            const step = steps[currentStep];
+            const expr = document.getElementById('expression').value;
+            
+            document.getElementById('res').textContent = step.res;
+            document.getElementById('sign').textContent = step.sign === 1 ? '+' : '-';
+            document.getElementById('index').textContent = step.index;
+            document.getElementById('num').textContent = step.num;
+            document.getElementById('step-number').textContent = `步骤 ${currentStep + 1} / ${steps.length}`;
+            document.getElementById('step-description').textContent = step.description;
+
+            let exprHtml = '';
+            for (let i = 0; i < expr.length; i++) {
+                let className = 'char-normal';
+                if (i < step.charIndex || step.action === 'complete') {
+                    className = 'char-processed';
+                }
+                if (i === step.charIndex) {
+                    className = 'char-current';
+                }
+                exprHtml += `<span class="${className}">${expr[i]}</span>`;
+            }
+            document.getElementById('expression-progress').innerHTML = exprHtml;
+
+            renderStack('num-stack', step.numStack, step.action === 'push' && step.action);
+            renderStack('op-stack', step.opStack, step.action === 'push' && step.action);
+
+            document.getElementById('prev-btn').disabled = currentStep <= 0;
+            document.getElementById('next-btn').disabled = currentStep >= steps.length - 1;
+
+            if (step.action === 'complete') {
+                document.getElementById('final-result-container').innerHTML = 
+                    `<div class="final-result">🎉 计算完成! 结果 = ${step.finalResult}</div>`;
+                stopAuto();
+            }
+        }
+
+        function renderStack(stackId, items, animate) {
+            const stackEl = document.getElementById(stackId);
+            stackEl.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'stack-item';
+                if (animate && index === items.length - 1) {
+                    itemEl.classList.add('pushing');
+                }
+                itemEl.textContent = item;
+                stackEl.appendChild(itemEl);
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                renderStep();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep();
+            }
+        }
+
+        function toggleAuto() {
+            if (isAutoPlaying) {
+                stopAuto();
+            } else {
+                startAuto();
+            }
+        }
+
+        function startAuto() {
+            if (steps.length === 0) {
+                startAnimation();
+            }
+            isAutoPlaying = true;
+            document.getElementById('auto-btn').textContent = '⏸ 暂停';
+            const speed = parseInt(document.getElementById('speed').value);
+            autoInterval = setInterval(() => {
+                if (currentStep >= steps.length - 1) {
+                    stopAuto();
+                } else {
+                    nextStep();
+                }
+            }, speed);
+        }
+
+        function stopAuto() {
+            isAutoPlaying = false;
+            document.getElementById('auto-btn').textContent = '▶▶ 自动播放';
+            if (autoInterval) {
+                clearInterval(autoInterval);
+                autoInterval = null;
+            }
+        }
+
+        document.getElementById('speed').addEventListener('input', function() {
+            document.getElementById('speed-value').textContent = this.value + 'ms';
+            if (isAutoPlaying) {
+                stopAuto();
+                startAuto();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -50,13 +50,13 @@ public class BasicCalculator {
     }
 
     // 测试
-    public static void main(String[] args) {
-        BasicCalculator cal = new BasicCalculator();
-        // 用例1
-        System.out.println(cal.calculate("1 + 1"));          // 2
-        // 用例2
-        System.out.println(cal.calculate(" 2-1 + 2 "));      // 3
-        // 用例3 经典括号
-        System.out.println(cal.calculate("(1+(4+5+2)-3)+(6+8)")); //23
-    }
+    // public static void main(String[] args) {
+    //     BasicCalculator cal = new BasicCalculator();
+    //     // 用例1
+    //     System.out.println(cal.calculate("1 + 1"));          // 2
+    //     // 用例2
+    //     System.out.println(cal.calculate(" 2-1 + 2 "));      // 3
+    //     // 用例3 经典括号
+    //     System.out.println(cal.calculate("(1+(4+5+2)-3)+(6+8)")); //23
+    // }
 }
