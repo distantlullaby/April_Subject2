@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双栈计算器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>双栈计算器</h1>
+        
+        <div class="input-section">
+            <input type="text" id="expression" placeholder="输入表达式，例如: (1+(4+5+2)-3)+(6+8)" value="(1+(4+5+2)-3)+(6+8)">
+            <div class="buttons">
+                <button id="startManual" class="btn btn-primary">手动执行</button>
+                <button id="startAuto" class="btn btn-secondary">自动执行</button>
+                <button id="reset" class="btn btn-danger">重置</button>
+            </div>
+        </div>
+
+        <div class="stacks-container">
+            <div class="stack-wrapper">
+                <h3>结果栈 (保存括号前的结果)</h3>
+                <div class="stack" id="numStack">
+                </div>
+            </div>
+            <div class="stack-wrapper">
+                <h3>符号栈 (保存括号前的符号)</h3>
+                <div class="stack" id="opStack">
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="current-step">
+                <strong>当前步骤:</strong> <span id="currentStep">等待开始</span>
+            </div>
+            <div class="result-section">
+                <strong>计算结果:</strong> <span id="result">-</span>
+            </div>
+        </div>
+
+        <div class="manual-control" id="manualControl" style="display: none;">
+            <button id="nextStep" class="btn btn-primary">下一步</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
